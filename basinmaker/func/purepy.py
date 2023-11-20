@@ -198,7 +198,6 @@ def save_modified_attributes_to_outputs(mapoldnew_info,tempfolder,OutputFolder,c
 
         outline = create_watershed_boundary(mapoldnew_info)
         outline.to_file(os.path.join(OutputFolder,"outline.shp"))
-        outline.to_file(os.path.join(OutputFolder,"outline.geojson"),driver="GeoJSON")
         create_geo_jason_file(os.path.join(OutputFolder,cat_name))
 
     else:
@@ -228,7 +227,6 @@ def save_modified_attributes_to_outputs(mapoldnew_info,tempfolder,OutputFolder,c
         mapoldnew_info.to_file(os.path.join(OutputFolder,cat_name))
         outline = create_watershed_boundary(mapoldnew_info)
         outline.to_file(os.path.join(OutputFolder,"outline.shp"))
-        outline.to_file(os.path.join(OutputFolder,"outline.geojson"),driver="GeoJSON")
         return mapoldnew_info
 
 def create_watershed_boundary(mapoldnew_info):
@@ -315,6 +313,8 @@ def add_area_in_m2(data,prj_crs,area_col):
     return out
 
 def add_centroid_in_wgs84(data,colx,coly):
+    if data.crs is None:
+        data.set_crs("EPSG:4326", inplace=True)
     src_src = data.crs
     tost = data.copy()
 
@@ -389,8 +389,10 @@ def create_geo_jason_file(Input_Polygon_path):
 
         # reproject to WGS84
         input_pd = geopandas.read_file(input_path)
-
-        input_wgs_84 = input_pd.to_crs('EPSG:4326')
+        if input_pd.crs is None: #QM: added this. can use this to identify which part malfunctions in defining crs
+            input_wgs_84 = input_pd.set_crs("EPSG:4326", inplace=True)
+        else:
+            input_wgs_84 = input_pd.to_crs('EPSG:4326')
 
 
 

@@ -33,9 +33,12 @@ def select_lakes_by_area_r(
 
     lake_info = pd.read_sql_query(sqlstat, con)
     lake_info = lake_info.fillna(-9999)
+    
+    # select  connected lakes with area smaller than a threshold
     un_sl_con_lakeids = lake_info.loc[
         lake_info[lake_attributes[2]] < threshold_con_lake
     ][lake_attributes[0]].values
+    # select non connected lakes with area smaller than a threshold
     un_sl_noncon_lakeids = lake_info.loc[
         lake_info[lake_attributes[2]] < threshold_non_con_lake
     ][lake_attributes[0]].values

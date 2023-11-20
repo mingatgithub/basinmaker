@@ -26,7 +26,7 @@ def define_connected_and_non_connected_lake_type(
         grass, mode=1, input_a=str_connected_lake
     )
     #### create non connected lake raster
-#    grass.run_command("g.copy", rast=(lake, non_connected_lake), overwrite=True)
+    #    grass.run_command("g.copy", rast=(lake, non_connected_lake), overwrite=True)
 
 
     non_connected_lake_array = garray.array(mapname=lake)
@@ -41,13 +41,13 @@ def define_connected_and_non_connected_lake_type(
     exp = "%s = int(%s)" % (
         non_connected_lake,
         non_connected_lake,
-    )
+    )    # make the ID integer
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
 
     # grass.run_command(
     #     "r.null", map=non_connected_lake, setnull=Connect_Lake_Ids, overwrite=True
     # )
-    #### create potential connected lake raster
+    #### create potential connected lake raster. note that it contains background(Value=0)
     exp = "%s = if(isnull(int(%s)),%s,null())" % (connected_lake, non_connected_lake, lake)
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
 

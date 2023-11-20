@@ -575,9 +575,11 @@ def generate_stats_list_from_grass_raster(
     for line in p.stdout:
         line_str = line.decode("utf8").rstrip("\r\n").split(" ")
         list_a.append(int(line_str[0]))
-        if mode != 1:
+        if mode  != 1:
             list_b.append(int(line_str[1]))
     p.wait()
+
+    # list_a = [item for item in list_a if item != 0] # remove 0
 
     return list_a, list_b
 
@@ -644,7 +646,7 @@ def generate_routing_info_of_catchments(
     grass, con, garray,cat="Net_cat", acc="acc_grass", Name="a1", str="#"
 ):
 
-    Raster_res = grass.core.region()["nsres"]
+    Raster_res = grass.core.region()["nsres"] #get raster resolution
 
     ###find outlet point of each cat
     grass.run_command(
@@ -688,7 +690,7 @@ def generate_routing_info_of_catchments(
 ## section to remove fake outlet points, may not needed when using r.statistics in stead of
 #  r.stats.zonal
 ###############################################################
-###    # remove fake outlet,
+###    # remove fake outlet( defined by duplicate subIds yet with inormally small accumaltion value)
     sqlstat = "SELECT cat, OL_acc,SubId FROM %s" % (
         Name + "_OL_v1"
     )
@@ -703,7 +705,7 @@ def generate_routing_info_of_catchments(
     #     if outletinfo_temp['OL_acc'].values[k] == outletinfo_temp['maxacc'].values[k]:
     #          extract_cat.append(outletinfo_temp['cat'].values[k])
 
-    # remove cat not belongs to fake outlet
+    # remove cat (not?) belongs to fake outlet
     # extract_cat = np.array(extract_cat)
     array_cat_OL2 = garray.array(mapname=Name + "_OL_2")
     mask = np.logical_not(np.isin(array_cat_OL2, extract_cat))
@@ -758,7 +760,7 @@ def generate_routing_info_of_catchments(
 
 #    grass.run_command("v.db.update", map=Name + "_OL_v", column="SubId", qcol="cat")
 #    grass.run_command("v.what.rast", map=Name + "_OL_v", raster=acc, column="OL_acc")
-    grass.run_command(
+    grass.run_command( #create buffer for each subbasin outlet
         "v.buffer",
         input=Name + "_OL_v",
         output=Name + "_OL_v_bf",
@@ -779,7 +781,7 @@ def generate_routing_info_of_catchments(
         output=Name + "_minacc",
         overwrite=True,
     )
-    ### Find the grid that equal to the max acc, thus this is the outlet grids
+    ### Find the grid that equal to the min acc, thus this is the inlet grids
 
     exp = "%s = int(%s)" % (
         Name + "_acc_riv",
@@ -794,7 +796,7 @@ def generate_routing_info_of_catchments(
         str,
     )
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
-    ### change outlet points to point vector
+    ### change inlet points to point vector
     grass.run_command(
         "r.to.vect",
         input=Name + "_IL",
@@ -809,7 +811,7 @@ def generate_routing_info_of_catchments(
     grass.run_command("v.what.rast", map=Name + "_IL_v", raster=acc, column="IL_acc")
     #    grass.run_command('v.db.update', map=  Name+'_IL_v', column = "IL_acc",qcol = 'IL_acc_db - 1')
 
-    #### add max acc inlet point acc value to Name+'_OL_v_bf'
+    #### add max, min acc value of inlet point to Name+'_OL_v_bf'
     grass.run_command(
         "v.vect.stats",
         point=Name + "_IL_v",
@@ -947,11 +949,11 @@ def generate_routing_info_of_catchments(
         radius=1.5,
         overwrite=True,
     )
-    # "_OL1_G_Clu" has the unique id for meeting point between catchments
+    # in "_OL1_G_Clu", all the inlets to the same downstream subbasins have identical IDs.
 
     grass.run_command(
         "r.clump", input=Name + "_OL1_G", output=Name + "_OL1_G_Clu", overwrite=True
-    )
+    ) 
 
     ###find inlets of each subbasin
     grass.run_command(
@@ -981,7 +983,7 @@ def generate_routing_info_of_catchments(
         overwrite=True,
     )
 
-    grass.run_command(
+    grass.run_command( # update the vector attributes according to the raster
         "v.what.rast",
         map=Name + "_OL_v",
         raster=Name + "_OL1_G_Clu_IL_SubId",

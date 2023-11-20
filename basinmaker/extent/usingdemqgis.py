@@ -140,8 +140,9 @@ def define_project_extent_using_dem(
         OUTPUT=os.path.join(grassdb, mask + ".shp"),
         USING_GDAL_FUNCTION=True,
     )
-    PERMANENT.close()
 
+
+    PERMANENT.close()
     Qgs.exit()
 
     return

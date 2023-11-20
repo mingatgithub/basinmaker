@@ -23,13 +23,13 @@ def define_pour_points_with_lakes(
     catchment_pourpoints_outside_lake="catchment_pourpoints_outside_lake",
 ):
     r_nuill_n = 5000
-    # define catchment pourpoints and routing info
+    # define catchment downstream basin ID and accumulation
     routing_info = generate_routing_info_of_catchments(
         grass, con, cat=cat_no_lake, acc=acc, str=str_r, Name="cat1",garray=garray
     )
     routing_info = routing_info.fillna(-1)
 
-    # define lake outlets
+    # define outlets for selected lakes
     # lake maximum acc 
     grass.run_command(
         "r.stats.zonal",

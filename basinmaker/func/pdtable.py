@@ -616,8 +616,8 @@ def remove_possible_small_subbasins(mapoldnew_info, area_thresthold=50, length_t
                         attributes["RivLength"].values)
                 elif col in ["RivSlope", "FloodP_n", "Q_Mean", "Ch_n"] and update_river:
                     mapoldnew_info_new.loc[mask, col] = np.average(
-                        attributes[col].values[attributes[col].values > 0],
-                        weights=attributes[col].values[attributes[col].values > 0],
+                        attributes[col].values,
+                        weights=attributes[col].values,
                     )
                 elif col in ["Max_DEM"] and update_river:
                     mapoldnew_info_new.loc[mask, col] = np.max(
@@ -1158,7 +1158,7 @@ def streamorderanddrainagearea(catinfoall):
         # if catinfo['BkfWidth'].values[i] > 0 and catinfo['RivSlope'].values[i] > 0 :
         #     catinfo.loc[idx,'Ch_n'] = calculateChannaln(catinfo['BkfWidth'].values[i],catinfo['BkfDepth'].values[i],
         #                       catinfo['Q_Mean'].values[i],catinfo['RivSlope'].values[i])
-        if catinfoall[Gauge_col_Name].values[i] > 0 and "DA_Obs" in catinfoall.columns and "DA_error" in catinfoall.columns:
+        if catinfoall[Gauge_col_Name].values[i] > 0:
             if catinfoall["DA_Obs"].values[i] > 0:
                 catinfoall.loc[idx, "DA_error"] = (
                     catinfoall["DrainArea"].values[i] / 1000.0 / 1000.0
@@ -2408,14 +2408,7 @@ def update_the_selected_river_to_connect_upsub_with_largest_da(Selected_riv, map
     mask_lakes = np.logical_and(
         mapoldnew_info['Lake_Cat'] == 1, ~mapoldnew_info['HyLakeId'].isin(lakeid_in_new_network))
 
-
-    # Hongren Debug 2023-05-30
-    # Has_Gauge
-    Gauge_col_Name = "Has_POI"
-    if "Has_POI" not in Selected_riv.columns:
-        Gauge_col_Name = "Has_Gauge"
-
-    mask_pois = mapoldnew_info[Gauge_col_Name] > 0
+    mask_pois = mapoldnew_info['Has_POI'] > 0
 
     potential_sub_to_extend = mapoldnew_info[np.logical_or(
         mask_lakes, mask_pois)].copy(deep=True)

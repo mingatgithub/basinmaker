@@ -50,27 +50,27 @@ def modify_str_r_to_add_sub_in_head_str(
     
     
     
-    ### add new outlet only to 'str_without_lake'
-    
+    ### add new outlet only to 'str_without_lake' 
+    # [type_code<1 means start end of streams]
     grass.run_command("v.extract", input=str_v, layer = 1, type = 'point',output = 'str_p',where = 'type_code < 1',overwrite=True)
 
-    sqlstat = "SELECT cat FROM %s" % str_v
+    sqlstat = "SELECT cat FROM %s" % str_v 
     All_ids = pd.read_sql_query(sqlstat, con)
     max_subid = np.max(All_ids['cat'].values)
     
     grass.run_command(
-        "v.db.addcolumn", map='str_p', columns="newcat int"
+        "v.db.addcolumn", map='str_p', columns="newcat int" # add new integer column named newcat
     )
-    qcol = "cat + %s" %(str(int(max_subid)))
+    qcol = "cat + %s" %(str(int(max_subid))) # QM: don't understand why
     
     grass.run_command(
-        "v.db.update", map='str_p', column="newcat", qcol=qcol
+        "v.db.update", map='str_p', column="newcat", qcol=qcol  
     )
     grass.run_command(
         "v.to.rast", input='str_p', output='str_p', attribute_column="newcat",use="attr", overwrite=True
     )
 
-    # remove points that 
+    # remove points on streams with lake 
     exp = "%s = if(isnull(%s),null(),%s)" % (
        'str_p',
        'str_without_lake',
@@ -78,7 +78,7 @@ def modify_str_r_to_add_sub_in_head_str(
     )
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
     
-
+    # expand the point rasters by three pixels
     grass.run_command(
         "r.grow",
         input='str_p',
@@ -87,6 +87,7 @@ def modify_str_r_to_add_sub_in_head_str(
         overwrite=True,
     )
     
+    # keep the point raster spatially matches streams
     exp = "%s = if(isnull(%s),null(),%s)" % (
        'str_t',
         str_r,
@@ -94,6 +95,7 @@ def modify_str_r_to_add_sub_in_head_str(
     )
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
 
+    # QM:add the new outlet point pixels to str_r raster
     exp = "%s = if(isnull(%s),%s,%s)" % (
         str_r,
        'str_t',
@@ -101,7 +103,8 @@ def modify_str_r_to_add_sub_in_head_str(
        'str_t',
     )
     grass.run_command("r.mapcalc", expression=exp, overwrite=True)
-                    
+
+    # make str_r raster integer                
     exp = "%s = int(%s)" % (
         str_r,
         str_r,

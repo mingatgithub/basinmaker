@@ -358,7 +358,7 @@ def qgis_raster_return_raster_properties(processing, INPUT):
         None,
     """
     cellSize = float(INPUT.rasterUnitsPerPixelX())  ### Get Raster cell size
-    SpRef_in = INPUT.crs().authid()  ### get Raster spatialReference id
+    SpRef_in = GEO_EPSG_CRS_AUTHID   #INPUT.crs().authid()  ### get Raster spatialReference id
     return cellSize, SpRef_in
 
 
@@ -1061,10 +1061,11 @@ def qgis_vector_return_crs_id(
     -------
         None,
     """
+
     if Input_Is_Feature_In_Mem:
         out = INPUT_Layer.crs().authid()
     else:
-        layer = QgsVectorLayer(INPUT_Layer, "")
+        layer = QgsVectorLayer(INPUT_Layer,"")
         out = layer.crs().authid()
 
     return out
@@ -1208,7 +1209,7 @@ def qgis_vector_reproject_layers(processing, context, INPUT, TARGET_CRS, OUTPUT)
         "native:reprojectlayer",
         {
             "INPUT": INPUT,
-            "TARGET_CRS": QgsCoordinateReferenceSystem(TARGET_CRS),
+            "TARGET_CRS": TARGET_CRS,
             "OUTPUT": OUTPUT,
         },
     )

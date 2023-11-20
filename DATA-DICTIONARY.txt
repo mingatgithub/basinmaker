@@ -1,0 +1,27 @@
+# Data dictionary for GRASS GIS output
+
+- cat_no_lake : raster of subbasin boundary
+- <cat%i%>_maxacc : process raster for generating outlet pixel
+- <cat%i%>_OL_v1 : vector of outlets of all subbasins, which could contain fake outlets
+- <cat%i%>_OL_v2 : raster of outlets of all subbasins
+- <cat%i%>_OL : process raster
+- <cat%i%>_OL1 : process raster derived from <cat%i%>_OL
+- <cat%i%>_OL1_G : derived from <cat%i%>_OL1, grow by a radius of 1.5 pixels. 
+- <cat%i%>_OL_v: point vector of true subbasin outlets, which have remvoed fake outlets
+	- Column <DSubId_str>: the subbasin ID that stream flows towards
+	- Column <DSubAccstr>: inflow to downstream basin 
+	- Column <DowSubId>: final version, the subbasin ID that stream flows towards
+	- Column <MaxAcc_cat>: max accumulation of subbasin
+
+- <cat%i%>_acc_riv: accumulation raster but restricted only in stream channels
+- <cat%i%>_minacc: channel raster assigned with minimal accumulation
+- <cat%i%>_IL_v: point vector of inlet of subbasin
+- <cat%i%>_IL1: process raster
+
+- <cat%i%>_OL_v_bf: some stats for the outlet and inlet points
+	- Column <DSubId_str>: the subbasin ID that stream flows towards
+	- Column <DSubAccstr>: inflow to downstream basin 
+
+- lake_outflow_pourpoints
+-lake_inflow_pourpoints
+

@@ -136,7 +136,7 @@ def add_lakes_into_existing_watershed_delineation(
     con = sqlite3.connect(
         os.path.join(grassdb, grass_location, "PERMANENT", "sqlite", "sqlite.db")
     )
-
+    # QM:don't understand yet
     if path_sub_reg_lake_r != "#":
         grass.run_command(
             "r.unpack", input=path_sub_reg_lake_r, output="rg_lake", overwrite=True

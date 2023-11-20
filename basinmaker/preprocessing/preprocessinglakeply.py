@@ -1,6 +1,7 @@
 from basinmaker.func.pdtable import *
 from basinmaker.func.rarray import *
 from basinmaker.utilities.utilities import *
+from basinmaker.func.qgis import *
 import os
 
 
@@ -56,7 +57,8 @@ def preprocessing_lake_polygon(
             grassdb=grassdb,
             qgis_prefix_path=qgis_prefix_path,
             ply_path=os.path.join(grassdb, lake_name + ".shp"),
-            output=os.path.join(grassdb, lake_boundary_name + ".shp"),
+            output=os.path.join(grassdb, lake_boundary_name + "_temp.shp"),
+            ply_name=lake_boundary_name
         )
         # obtain_lake_vectors_larger_than_threstholds(
         #     grassdb=grassdb,
